@@ -18,12 +18,17 @@ public class UserDto {
     private String email;
 
        // Constructors, Getters & Setters
-    public UserDto() {}
-    
-    public UserDto(String name, String email) {
+    public UserDto(Integer id, String name, Integer age, String email) {
+        this.id = id;
         this.name = name;
+        this.age = age;
         this.email = email;
     }
+    
+    // public UserDto(String name, String email) {
+    //     this.name = name;
+    //     this.email = email;
+    // }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

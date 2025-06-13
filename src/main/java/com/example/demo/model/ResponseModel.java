@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.example.demo.model.response.FailedResponseModel;
-import com.example.demo.model.response.SuccessResponseModel;
+// import com.example.demo.model.response.FailedResponseModel;
+// import com.example.demo.model.response.SuccessResponseModel;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,8 +17,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 
 public class ResponseModel {
-    private String SuccessStatus = "SUCCESS";
-    private String FailedStatus = "FAILED";
     private String message;
     private List<FieldError> errors;
 
@@ -31,67 +29,80 @@ public class ResponseModel {
         private String field;
         private String message;
         private Object rejectedValue;
-
         // Constructors, getters, and setters
     }
 
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public class Success<T> {
-        private String status; // SUCCESS
+    public static class Success<T> {
+        private String status = "SUCCESS"; // SUCCESS
         private T data;
         private String message;
+
+        // Constructor that sets default status
+        public Success(T data, String message) {
+            this.data = data;
+            this.message = message;
+        }
+
     }
 
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-
-    public class Failed<T> {
-        private String status; // FAILED
+    public static class Failed<T> {
+        private String status = "FAILED"; // FAILED
         private String errorType; // BAD_REQUEST, NOT_FOUND, etc.
         private T error;
         private String message;
+
+        // Constructor that sets default status
+        public Failed(T error, String errorType, String message) {
+            this.errorType = errorType;
+            this.error = error;
+            this.message = message;
+        }
     }
 
-    public ResponseEntity<Object> Ok(T data, String message) {
-        Success<T> successResponse = new Success<T>(SuccessStatus, data, message);
-        return new ResponseEntity<Object>(successResponse, HttpStatus.OK);
+    public static <T> ResponseEntity<Success<T>> Success(T data, String message) {
+        Success<T> successResponse = new Success<T>(data, message);
+        return new ResponseEntity<Success<T>>(successResponse, HttpStatus.OK);
     }
 
-    public ResponseEntity<> BadRequestError(List<FieldError> error) {
+    public ResponseEntity<Failed<List<FieldError>>> BadRequest(List<FieldError> error, String msg) {
         String errorType = "BAD REQUEST";
-        String message = "Pls check requested payload.";
-        Failed<List<FieldError>> failedResponse = new Failed<List<FieldError>>(FailedStatus, errorType, error, message);
-        return new ResponseEntity<>(failedResponse, HttpStatus.BAD_REQUEST);
+        String message = (msg == null) ? "Please check your requested payload." : msg;
+        Failed<List<FieldError>> failedResponse = new Failed<List<FieldError>>(error, errorType, message);
+        return new ResponseEntity<Failed<List<FieldError>>>(failedResponse, HttpStatus.BAD_REQUEST);
     }
 
-    public <T> Failed<T> InternalServerError(T error) {
+    public <T> ResponseEntity<Failed<T>> InternalError(T error) {
         String errorType = "INTERNAL SERVER ERROR";
         String message = "Something went wrong.";
-        return new Failed<T>(FailedStatus, errorType, error, message);
+        Failed<T> failedResponse = new Failed<T>(error, errorType, message);
+        return new ResponseEntity<Failed<T>>(failedResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public <T> Failed<T> UnAuthorizedError(T error) {
-        String errorType = "UNAUTHORIZED";
-        String message = "Access denied.";
-        return new Failed<T>(FailedStatus, errorType, error, message);
-    }
+    // public <T> Failed<T> UnAuthorizedError(T error) {
+    // String errorType = "UNAUTHORIZED";
+    // String message = "Access denied.";
+    // return new Failed<T>(FailedStatus, errorType, error, message);
+    // }
 
-    public <T> Failed<T> InValidTokenError(T error) {
-        String errorType = "INVALID TOKEN";
-        String message = "Not acceptable due to invalid token.";
+    // public <T> Failed<T> InValidTokenError(T error) {
+    // String errorType = "INVALID TOKEN";
+    // String message = "Not acceptable due to invalid token.";
 
-        return new Failed<T>(FailedStatus, errorType, error, message);
-    }
+    // return new Failed<T>(FailedStatus, errorType, error, message);
+    // }
 
-    public <T> Failed<T> ExpiredTokenError(T error) {
-        String errorType = "INVALID TOKEN";
-        String message = "Not acceptable due to invalid token.";
+    // public <T> Failed<T> ExpiredTokenError(T error) {
+    // String errorType = "INVALID TOKEN";
+    // String message = "Not acceptable due to invalid token.";
 
-        return new Failed<T>(FailedStatus, errorType, error, message);
-    }
+    // return new Failed<T>(FailedStatus, errorType, error, message);
+    // }
 
     // public ResponseEntity<FailedResponseModel<Object>> internalServerError(Object
     // details) {

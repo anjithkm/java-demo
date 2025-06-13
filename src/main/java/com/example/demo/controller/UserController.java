@@ -3,12 +3,17 @@ package com.example.demo.controller;
 // import com.example.demo.dto.UserDTO;
 import com.example.demo.dto.request.UserDto;
 import com.example.demo.entity.User;
+import com.example.demo.model.ResponseModel;
+import com.example.demo.model.response.SuccessResponseModel;
 // import com.example.demo.model.FailedResponse;
 // import com.example.demo.model.SuccessResponse;
 import com.example.demo.service.UserService;
 import com.example.demo.utils.ResponseUtil;
 
 import jakarta.validation.Valid;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 // import java.util.List;
 // import java.util.stream.Collectors;
@@ -52,10 +57,9 @@ public class UserController {
     }
 
     @PostMapping
-    public Object createUser(@Valid @RequestBody UserDto userDto) {
-        ResponseUtil response = new ResponseUtil();
-        User user = new User("", "");
-        User result = userService.createUser(user);
-        return response.success(result, "User Created Successfully");
+    public ResponseEntity<?> createUser(@Valid @RequestBody UserDto userDto) {
+        ResponseModel Response = new ResponseModel();
+        // return Response.Success(null, "");
+        return ResponseEntity.ok(HttpStatus.ACCEPTED);
     }
 }
